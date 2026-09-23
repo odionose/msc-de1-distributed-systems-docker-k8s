@@ -1,0 +1,2 @@
+flask-app-6db9cb8c5b-ps97w  user=1000  nonroot=true  seccomp=RuntimeDefault  readOnly=true  privilegeEscalation=false  capabilities=["ALL"]
+flask-app-6db9cb8c5b-xg5q9  user=1000  nonroot=true  seccomp=RuntimeDefault  readOnly=true  privilegeEscalation=false  capabilities=["ALL"]

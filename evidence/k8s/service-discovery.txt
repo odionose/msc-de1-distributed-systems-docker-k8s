@@ -1,0 +1,6 @@
+GET /:
+Hello, Flask!
+GET /items:
+{"items":[]}
+
+pod "curl-test" deleted from flask-app namespace

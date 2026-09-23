@@ -1,0 +1,2 @@
+NAME        TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+flask-app   ClusterIP   10.96.7.67   <none>        5000/TCP   57s

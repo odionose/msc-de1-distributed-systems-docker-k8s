@@ -1,0 +1,4 @@
+NAME            READY   STATUS    RESTARTS   AGE   IP           NODE                            NOMINATED NODE   READINESS GATES
+kindnet-94jnc   1/1     Running   0          51m   172.22.0.3   msc-de1-cluster-control-plane   <none>           <none>
+kindnet-pr9h9   1/1     Running   0          51m   172.22.0.2   msc-de1-cluster-worker2         <none>           <none>
+kindnet-vgp6j   1/1     Running   0          51m   172.22.0.4   msc-de1-cluster-worker          <none>           <none>

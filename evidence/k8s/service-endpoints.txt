@@ -1,0 +1,2 @@
+NAME        ENDPOINTS                         AGE
+flask-app   10.244.1.2:5000,10.244.3.2:5000   57s

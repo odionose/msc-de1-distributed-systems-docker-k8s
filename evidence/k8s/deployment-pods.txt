@@ -1,0 +1,3 @@
+NAME                         READY   STATUS    RESTARTS   AGE     IP           NODE                      NOMINATED NODE   READINESS GATES
+flask-app-6db9cb8c5b-ps97w   1/1     Running   0          2m15s   10.244.1.2   msc-de1-cluster-worker2   <none>           <none>
+flask-app-6db9cb8c5b-xg5q9   1/1     Running   0          2m15s   10.244.3.2   msc-de1-cluster-worker    <none>           <none>
