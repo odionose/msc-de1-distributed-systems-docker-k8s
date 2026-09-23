@@ -16,5 +16,6 @@ __pycache__
 
 tests/
 evidence/
+security/
 
 *.md

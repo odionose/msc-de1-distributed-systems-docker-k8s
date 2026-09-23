@@ -2,7 +2,7 @@ services:
   flask-app:
     build:
       context: .
-    image: msc-de1-flask-app:1.0.0
+    image: msc-de1-flask-app:1.0.2
     container_name: msc-de1-flask-compose
     ports:
       - "5001:5000"
