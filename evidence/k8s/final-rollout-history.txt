@@ -1,0 +1,5 @@
+deployment.apps/flask-app 
+REVISION  CHANGE-CAUSE
+2         Rolling update demonstration
+3         Rolling update demonstration
+

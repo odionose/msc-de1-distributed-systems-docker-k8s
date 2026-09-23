@@ -1,0 +1,2 @@
+NAME              ADDRESSTYPE   PORTS   ENDPOINTS                            AGE
+flask-app-9g977   IPv4          5000    10.244.1.11,10.244.3.5,10.244.1.12   111m

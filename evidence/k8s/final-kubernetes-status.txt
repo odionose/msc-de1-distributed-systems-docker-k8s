@@ -1,0 +1,13 @@
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS   IMAGES                                   SELECTOR
+deployment.apps/flask-app   3/3     3            3           119m   flask-app    nathanaelodion/msc-de1-flask-app:1.0.2   app=flask-app
+
+NAME                             READY   STATUS    RESTARTS   AGE     IP            NODE                      NOMINATED NODE   READINESS GATES
+pod/flask-app-6db9cb8c5b-n6t5s   1/1     Running   0          6m29s   10.244.1.11   msc-de1-cluster-worker2   <none>           <none>
+pod/flask-app-6db9cb8c5b-vm262   1/1     Running   0          6m5s    10.244.1.12   msc-de1-cluster-worker2   <none>           <none>
+pod/flask-app-6db9cb8c5b-w6mqv   1/1     Running   0          6m17s   10.244.3.5    msc-de1-cluster-worker    <none>           <none>
+
+NAME                TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE    SELECTOR
+service/flask-app   ClusterIP   10.96.7.67   <none>        5000/TCP   111m   app=flask-app
+
+NAME                                                       POD-SELECTOR    AGE
+networkpolicy.networking.k8s.io/flask-app-network-policy   app=flask-app   100m
