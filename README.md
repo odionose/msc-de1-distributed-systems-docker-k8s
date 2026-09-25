@@ -4,7 +4,9 @@
 
 This project containerizes and deploys a small Flask REST API using Docker and a local Kubernetes cluster.
 
-The application is based on the original UBC Flask Sample App.
+The application is based on the original UBC Flask Sample App - https://github.com/ubc/flask-sample-app
+
+Docker image repository: https://hub.docker.com/r/nathanaelodion/msc-de1-flask-app
 
 The application provides a simple item API:
 
@@ -14,6 +16,36 @@ The application provides a simple item API:
 - `POST /items` — adds an item
 
 The project demonstrates containerization, container security, image scanning, Docker Hub publishing, Kubernetes deployment, service discovery, scaling, self-healing, rolling updates, rollback, and network isolation.
+
+## Architecture
+
+```text
+                         Docker Hub
+                             |
+                             v
+              nathanaelodion/msc-de1-flask-app:1.0.2
+                             |
+                             v
+                 +-----------------------+
+                 |   kind Kubernetes     |
+                 |   msc-de1-cluster     |
+                 +-----------------------+
+                   |        |          |
+                   v        v          v
+              Control     Worker     Worker2
+              Plane                   |
+                                      |
+                         +------------+------------+
+                         | Service: flask-app      |
+                         | ClusterIP :5000         |
+                         +------------+------------+
+                                      |
+                         +------------+------------+
+                         |            |            |
+                         v            v            v
+                      Flask Pod   Flask Pod    Flask Pod
+                      Replica 1   Replica 2    Replica 3
+```
 
 ## 2. Requirements
 
@@ -226,7 +258,16 @@ Remove the Kubernetes cluster:
 kind delete cluster --name msc-de1-cluster
 ```
 
-## 11. License
+## 11. Limitations and Technical Considerations
+
+The application uses process-local in-memory state, meaning each Kubernetes replica maintains its own items list. The Service distributes requests between replicas but does not synchronize their state. A production implementation would therefore require shared persistent storage, such as a database.
+
+The Kubernetes environment was created with kind, so although it demonstrates real Kubernetes scheduling, networking, scaling and recovery behaviour, the nodes run within a local development environment rather than production infrastructure. Production deployment would require additional considerations such as persistent storage, monitoring, load balancing, backups and secret management.
+
+The final Docker image contained no Critical vulnerabilities, although High, Medium and Low findings remained. The remaining higher-severity findings were associated with base-image components without fixed versions reported by the scanner. The project therefore demonstrates vulnerability reduction and risk documentation rather than claiming a completely vulnerability-free image.
+
+
+## 12. License
 
 This project follows the license included in the repository.
 
