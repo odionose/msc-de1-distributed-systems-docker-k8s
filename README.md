@@ -1,91 +1,235 @@
-# Flask Sample App with Tests
+# Docker & Local Kubernetes Project
 
-This is a simple Flask web application with unit tests. The application provides a basic REST API for managing a list of items. It serves as a starting point for learning how to create a Flask application and write tests for it.
+## 1. Project Overview
 
-## Project Structure
+This project containerizes and deploys a small Flask REST API using Docker and a local Kubernetes cluster.
 
-The project is organized as follows:
+The application is based on the original UBC Flask Sample App.
 
-- `app/`: Contains the Flask application and routes.
-- `tests/`: Houses unit tests for the application.
-- `run.py`: A script to run the Flask application.
+The application provides a simple item API:
 
-## Getting Started
+- `GET /` — returns a welcome message
+- `GET /items` — returns stored items
+- `GET /items/<id>` — returns one item
+- `POST /items` — adds an item
 
-To get the Flask app up and running on your local machine, follow these steps:
+The project demonstrates containerization, container security, image scanning, Docker Hub publishing, Kubernetes deployment, service discovery, scaling, self-healing, rolling updates, rollback, and network isolation.
 
-1. **Clone the Repository:**
+## 2. Requirements
 
-   ```bash
-   git clone <repository_url>
-   cd flask_sample_app
-   ```
+Install:
 
-2. **Set Up a Virtual Environment:**
+- Docker
+- Docker Compose
+- kubectl
+- kind
+- Git
 
-   It's recommended to create a virtual environment to isolate project dependencies.
+## 3. Run the Application Locally
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use venv\Scripts\activate
-   ```
+Clone the repository:
 
-3. **Install Dependencies:**
+```bash
+git clone <repository-url>
+cd msc-de1-distributed-systems-docker-k8s
+```
 
-   Install the necessary dependencies using `pip`:
+Install the Python dependency:
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-4. **Run the Application:**
+Run the application:
 
-   Start the Flask application:
+```bash
+PORT=5001 python run.py
+```
 
-   ```bash
-   python run.py
-   ```
+Test it:
 
-   The app will be available at [http://localhost:5000](http://localhost:5000).
+```bash
+curl http://localhost:5001/
+curl http://localhost:5001/items
+```
 
-5. **Run Tests:**
+Run the tests:
 
-   To run the unit tests, execute the following command:
+```bash
+pytest
+```
 
-   ```bash
-   python -m unittest discover tests
-   ```
+## 4. Run with Docker
 
-   This command will discover and run all tests in the `tests` directory.
+Build the image:
 
-## Application Routes
+```bash
+docker build -t msc-de1-flask-app:1.0.2 .
+```
 
-The application provides the following routes:
+Run it:
 
-- `GET /`: Returns a simple greeting message.
-- `GET /items`: Returns a list of items.
-- `GET /items/{item_id}`: Returns the details of a specific item.
-- `POST /items`: Adds a new item to the list.
+```bash
+docker run -d \
+  --name flask-app \
+  -p 5000:5000 \
+  msc-de1-flask-app:1.0.2
+```
 
-## Testing
+Test:
 
-Unit tests are provided in the `tests` directory. They cover the basic functionality of the application, including route handling and response validation. You can use these tests as a reference to write your own tests or to verify the correctness of the application.
+```bash
+curl http://localhost:5000/
+```
 
-## License
+Stop and remove the container:
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```bash
+docker rm -f flask-app
+```
 
-## Contribute
+## 5. Run with Docker Compose
 
-Feel free to contribute to this project by opening issues or submitting pull requests. We welcome any improvements, bug fixes, or additional features.
+```bash
+docker compose up --build
+```
 
-## Author
+Test:
 
-- Pan Luo
+```bash
+curl http://localhost:5001/
+```
 
-## Acknowledgments
+Stop:
 
-- This project was created as a sample Flask application for educational purposes.
-- Special thanks to the Flask community for providing a fantastic web framework.
+```bash
+docker compose down
+```
 
-Enjoy experimenting with the Flask sample app! If you have any questions or need further assistance, please don't hesitate to reach out.
+## 6. Security
+
+The Docker image runs as a non-root user and includes a container health check.
+
+The Compose configuration also uses:
+
+- `no-new-privileges`
+- dropped Linux capabilities
+- read-only root filesystem
+
+Security scan results and the SBOM are stored in:
+
+- `security/`
+
+## 7. Reproduce the Kubernetes Deployment
+
+Create the three-node kind cluster:
+
+```bash
+kind create cluster \
+  --name msc-de1-cluster \
+  --config kind/kind-config.yaml
+```
+
+Apply the Kubernetes resources:
+
+```bash
+kubectl apply -f k8s/
+```
+
+Check the deployment:
+
+```bash
+kubectl get nodes
+kubectl get pods -n flask-app
+kubectl get service -n flask-app
+```
+
+The deployment runs three replicas.
+
+Test the application from inside the cluster:
+
+```bash
+kubectl run curl-test \
+  -n flask-app \
+  --rm -it \
+  --image=curlimages/curl \
+  -- curl http://flask-app:5000/
+```
+
+The Kubernetes configuration includes:
+
+- non-root execution
+- dropped capabilities
+- read-only root filesystem
+- seccomp
+- resource requests and limits
+- readiness and liveness probes
+- ClusterIP service
+- NetworkPolicy
+
+## 8. Reproduce Kubernetes Behaviour
+
+Scale:
+
+```bash
+kubectl scale deployment flask-app -n flask-app --replicas=3
+```
+
+Test self-healing:
+
+```bash
+kubectl delete pod <pod-name> -n flask-app
+kubectl get pods -n flask-app -w
+```
+
+Test a rolling update:
+
+```bash
+kubectl patch deployment flask-app -n flask-app \
+  -p '{"spec":{"template":{"metadata":{"annotations":{"rollout-demo":"v1"}}}}}'
+
+kubectl rollout status deployment/flask-app -n flask-app
+```
+
+View rollout history:
+
+```bash
+kubectl rollout history deployment/flask-app -n flask-app
+```
+
+Rollback:
+
+```bash
+kubectl rollout undo deployment/flask-app -n flask-app --to-revision=1
+```
+
+## 9. Evidence
+
+Project evidence is organised in:
+
+- `evidence/`
+
+Kubernetes manifests and cluster configuration are in:
+
+- `k8s/`
+- `kind/`
+
+Security files are in:
+
+- `security/`
+
+## 10. Cleanup
+
+Remove the Kubernetes cluster:
+
+```bash
+kind delete cluster --name msc-de1-cluster
+```
+
+## 11. License
+
+This project follows the license included in the repository.
+
+The original Flask Sample App is provided by UBC:
+
+https://github.com/ubc/flask-sample-app
